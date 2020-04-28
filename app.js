@@ -3,6 +3,14 @@ const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const route = require('./route.js');
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+
+const options = {
+	key: fs.readFileSync('myCA.key'),
+  	cert: fs.readFileSync('myCA.pem')
+};
 
 app.use(cors());
 
@@ -22,9 +30,9 @@ app.use('/', route);
 
 app.use(express.static(__dirname + '/public',{ redirect : false }));
 
-var server = app.listen(3000, function () {
-  var port = server.address().port;
-	var address = server.address().address;
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(options, app);
 
-  	console.log('App listening at port:', address + port);
+httpsServer.listen(3001, () => {
+	console.log('HTTPS Server running on port 3001');
 });
